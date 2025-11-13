@@ -50,18 +50,19 @@ define-command -hidden setm -params 1 %{
 
 declare-option int gapm_width 32  # default separator ruler length
 
-# gapm %{ <user-mode> [[1|2|3] | <separator>] }  # WHERE: up to 3 separators [+-=] within a single user-mode, default '+'
+# gapm %{ <user-mode> [[1|2|3|4] | <separator>] }
 define-command -hidden gapm -params 1 %{
 	evaluate-commands %sh{
 		docstring() { for i in $(seq 1 $kak_opt_gapm_width) ;do printf "${F:-⠀}" ;done; [ -z "$F" ] && echo "$K\n⠀" || echo "$K"; }  # NOTE: U+2800 (braille blank) to prevent kak space char trimming
 
-		set -- $1  # <user-mode> [1 | 2 | 3 | <separator>]
+		set -- $1  # ATTN: set -- %{ <user-mode> [1 | 2 | 3 | <separator>] } to separate elements
 		# NOTE: multiple separators within a single user-mode list must map unique keys and docstrings (to display as separate lines)
 		case "$2" in
 			'' ) K=· ;;         # U+00b7 default
-			1  ) K=· ;;         # U+00b7 of 3 available utf-8 center dot characters
+			1  ) K=· ;;         # U+00b7 of 4 available utf-8 center dot glyphs
 			2  ) K=‧ ;;         # U+2027
 			3  ) K=ꞏ ;;         # U+a78f
+			4  ) K=⋅ ;;         # U+22c5
 			*  ) K=$2; F=$2 ;;  # non-blank (visual) separator NOTE: limited to glyphs not represented by kak "<named>" character
 		esac
 		echo "map global $1 '$K' ': nop<ret>' -docstring '$(docstring)'"
